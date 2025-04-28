@@ -1,16 +1,13 @@
-def cast_n_dia_a_dia_semana(n):
+def cast_n_dia_a_dia_semana(n: int):
     """
     Convierte un número entero n en una cadena que representa el día de la semana correspondiente.
     
     :param n:  Número entero que representa el día de la semana (0-6)
     :return:  String que representa el día de la semana
     """
-    weekdays =  ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
-    
-    if 0 <= n < 7:
-        return weekdays[n]
-    else:
-        return "Valor NO válido: el número debe estar entre 0 y 6 (inclusive)."
+
+    dias = {1: 'Lunes', 2: 'Martes', 3: 'Miércoles', 4: 'Jueves', 5: 'Viernes', 6: 'Sábado', 7: 'Domingo'}
+    return dias.get(n, 'Número inválido')
 
 def piramide(n_filas):
     """
@@ -48,7 +45,7 @@ def contador_generico(txt):
     Cuenta cuántas veces aparece cada letra en un texto.
     """
     dict_result = {}
-    for letra in set(txt):
+    for letra in txt:
         if letra.isalpha():
             dict_result[letra] = dict_result.get(letra, 0) + 1
     return dict_result
@@ -75,11 +72,9 @@ def fibonacci(n):
     """
     Genera una lista con los primeros n números de la serie de Fibonacci.
     """
-    fib = [0, 1]
-    for i in range(2, n+1):
-        fib.append(fib[i-1] + fib[i-2])
-    # print(n, ":", fib)
-    return fib[-1]
+    if n <= 1:
+        return n
+    return fibonacci(n - 1) + fibonacci(n - 2)
 
 def calc_area_cuadrado(lado):
     """
