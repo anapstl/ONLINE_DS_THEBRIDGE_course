@@ -144,3 +144,42 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+    # _____________________________________
+
+    import random
+
+def generar_barcos():
+    """
+    Genera una lista de barcos que no se solapen y cuyos valores no sean mayores de 10.
+    """
+    tablero = set()  # Usamos un conjunto para rastrear las posiciones ocupadas
+    barcos = []
+    longitudes = [4, 3, 3, 2]  # Longitudes de los barcos
+
+    for longitud in longitudes:
+        while True:
+            # Generar orientación aleatoria
+            orientacion = random.choice(["H", "V"])
+            
+            if orientacion == "H":  # Horizontal
+                fila = random.randint(0, 9)
+                col = random.randint(0, 10 - longitud)
+                barco = [[fila, col + i] for i in range(longitud)]
+            else:  # Vertical
+                fila = random.randint(0, 10 - longitud)
+                col = random.randint(0, 9)
+                barco = [[fila + i, col] for i in range(longitud)]
+            
+            # Verificar que no se solapen
+            if all(tuple(casilla) not in tablero for casilla in barco):
+                barcos.append(barco)
+                tablero.update(tuple(casilla) for casilla in barco)
+                break
+
+    return barcos
+
+# Generar barcos
+barcos_jugador = generar_barcos()
+print(barcos_jugador)
