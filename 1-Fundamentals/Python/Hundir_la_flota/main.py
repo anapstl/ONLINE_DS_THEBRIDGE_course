@@ -14,7 +14,7 @@ tirados = []
 Init tableros
 """
 clear_console()
-print("======================================================== HUNDIR LA FLOTA")
+print(emoji.emojize("======================================================== HUNDIR LA FLOTA :ship::bomb:"))
 
 tablero_jugador = crear_tablero()
 tablero_jugador_tiros = crear_tablero()
@@ -30,19 +30,10 @@ tablero_pc = colocar_barcos(tablero_pc, barcos_pc)
 print("Tablero del PC con barcos cargados:")
 pretty_tablero(tablero_pc)
 
-# disparar([0, 2], tablero_jugador)
-# print(tablero_jugador)
-
 while touche:
     print("El turno es del:", "JUGADOR" if turno else "PC")
     if turno:
         casilla = get_xy_tiro(turno)                           # Es el turno del JUGADOR
-        # casilla = [int(x) for x in input("Introduce dos nº separados por comma (fila, col): ").split(',')]
-        # TODO: ctrl input, chars, nr mayores
-        # if casilla in tirados:
-        #     print("Tiro repetido; intentalo de nuevo")
-        #     casilla = [int(x) for x in input("Introduce dos nº separados por comma (fila, col): ").split(',')]
-        # tirados.append(casilla)
         barcos_pc_cpy = barcos_pc.copy()
         turno, tablero_pc = disparar(turno, casilla, barcos_pc_cpy, tablero_pc, tablero_jugador_tiros)  # despues de disparar hay que ver si quedan barcos... sin no Has Ganado
         print("barcos pc", barcos_pc_cpy)
@@ -52,16 +43,11 @@ while touche:
         pretty_tablero(tablero_jugador_tiros)
         print(barcos_pc)
         if turno and all(len(barco) == 0 for barco in barcos_pc_cpy):
-            print("Felicidades, has ganado!")
+            print(emoji.emojize("Felicidades, has ganado!:trophy:"))
             break
     else:
         # turno PC
         casilla = get_xy_tiro(turno)
-        # casilla = [int(x) for x in input("Introduce dos nº separados por comma (fila, col): ").split(',')]
-        # if casilla in tirados:
-        #     print("Tiro repetido; intentalo de nuevo")
-        #     casilla = [int(x) for x in input("Introduce dos nº separados por comma (fila, col): ").split(',')]
-        # tirados.append(casilla)
         barcos_jugador_cpy = barcos_jugador.copy()
         turno, tablero_jugador  = disparar(turno, casilla, barcos_jugador_cpy, tablero_jugador)
         print('tablero JUGADOR tras disparos')

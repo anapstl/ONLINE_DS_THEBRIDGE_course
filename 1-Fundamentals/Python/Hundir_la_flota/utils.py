@@ -85,30 +85,52 @@ def disparar(turno:bool, casilla:list, barcos:list, tablero:np.ndarray, *tablero
     return not(turno), tablero
 
 def get_xy_tiro(turno:bool):
+    """
+    Obtiene las coordenadas del disparo según el turno.
+    Si es el turno del jugador, solicita input validado.
+    Si es el turno del PC, genera coordenadas aleatorias.
+    """
     if turno:
-        casilla = [int(x) for x in input("Introduce dos nº separados por comma (fila, col): ").split(',')]
-        # TODO: ctrl input, chars, nr mayores
-        while (casilla in tirados_jugador):
-            print("Tiro repetido; intentalo de nuevo")
-            casilla = [int(x) for x in input("Introduce dos nº separados por comma (fila, col): ").split(',')]
-        print("Tirados jugador antes", tirados_jugador)
-        tirados_jugador.append(casilla)
-        print("Tirados jugador despues", tirados_jugador)
+        while True:
+            try:
+                casilla = [int(x) for x in input("Introduce dos nº separados por comma  (fila, col): ").split(',')]
+                # Validar que sean exactamente dos números
+                if len(casilla) != 2:
+                    raise ValueError("Debes introducir exactamente dos números separados por coma.")
+                
+                # Validar rango de las coordenadas
+                if not (0 <= casilla[0] < 10 and 0 <= casilla[1] < 10):
+                    raise ValueError("Las coordenadas deben estar entre 0 y 9.")
+                
+                # Validar que no sea un tiro repetido
+                if casilla in tirados_jugador:
+                    print("Tiro repetido; intenta de nuevo.")
+                    continue
+                
+                # Si todo es válido, agregar a la lista de tiros y salir del bucle
+                tirados_jugador.append(casilla)
+                print("Tirados jugador:", tirados_jugador)
+                return casilla
+            except ValueError as e:
+                print(f"Entrada inválida: {e}. Intenta de nuevo.")
     else:
         print("El PC elige los números:")
         time.sleep(2)
-        # Las coordenadas de tiros del PC se generan de forma aleatoria.
-        casilla = [random.randint(0,9) for _ in range(2)]
-        time.sleep(2)
-        print(casilla)
-        while (casilla in tirados_pc):
-            print("Tiro repetido; PC intenta de nuevo")
-            casilla = [random.randint(0,9) for _ in range(2)]
-        tirados_pc.append(casilla)
-    return casilla
+        while True:
+            # Generar coordenadas aleatorias
+            casilla = [random.randint(0, 9) for _ in range(2)]
+            
+            # Validar que no sea un tiro repetido
+            if casilla not in tirados_pc:
+                tirados_pc.append(casilla)
+                print("Tirados PC:", tirados_pc)
+                return casilla
+            print("Tiro repetido; PC intenta de nuevo.")
 
-# def colocar_barcos(barco, tablero):
-#     pass
+# def colocar_barco(barco, tablero):
+#     for fila, col in barco:
+#         tablero[fila, col] = 'O'
 
 # def crear_barco(eslora):
+# TODO
 #     pass
