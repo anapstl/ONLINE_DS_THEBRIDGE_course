@@ -1,6 +1,10 @@
 import numpy as np
 import os
+import random
 import time
+
+tirados_jugador = []
+tirados_pc = []
 
 def clear_console():
     '''
@@ -28,22 +32,23 @@ def crear_tablero(tamaño=10):
     """
     return np.full((tamaño, tamaño), "_")
 
-# def colocar_barco(barco, tablero):
-#     """
-#     Coloca un barco en el tablero. El barco es una lista de coordenadas.
-#     """
-#     for casilla in barco:
-#         tablero[casilla[0], casilla[1]] = "O"
-#     return tablero
-
-def colocar_barcos(tablero, barco):  # update a lista de lista
-# barco_jugador = [[[0, 3],[0, 4], [0, 5], [0, 6]], [[4, 7],[5, 7], [6, 7]], [[8, 8],[8, 9]],[[1, 7]]]
-    for i in barco:
-        for j in i:
-            tablero[j[0], j[1]] = "O"
+def colocar_barcos(tablero:np.ndarray, barcos:list):  # update a lista de lista
+    """
+    Coloca los barcos en el tablero. Es una lista de barcos y cada barco es una lista de coordenadas.
+    Los barcos se representan con el simbolo "O".
+    Parametros de entrada:
+        tablero: _np.ndarray_ respresentando el tablero
+        barcos: _list_ la lista de listas de barcos
+    Devuelve:
+        tablero: _np.ndarray_ el tablero actualizado con los barcos
+    """
+    # barco_jugador = [[[0, 3],[0, 4], [0, 5], [0, 6]], [[4, 7],[5, 7], [6, 7]], [[8, 8],[8, 9]],[[1, 7]]]
+    for barco in barcos:
+        for i in barco:
+            tablero[i[0], i[1]] = "O"
     return tablero
 
-def disparar(casilla:list, barcos:list, tablero:np.ndarray, *tablero_jugador_tiros:np.ndarray):
+def disparar(turno:bool, casilla:list, barcos:list, tablero:np.ndarray, *tablero_jugador_tiros:np.ndarray):
     '''
     Función de disparar para el Jugador. 
     Parametros de entrada:
@@ -69,7 +74,7 @@ def disparar(casilla:list, barcos:list, tablero:np.ndarray, *tablero_jugador_tir
             barco.remove(casilla)
             if len(barco) == 0:
                 print("BARCO HUNDIDO")
-            return True, tablero
+            return turno, tablero
 
     # agua
     print("agua")
@@ -77,11 +82,29 @@ def disparar(casilla:list, barcos:list, tablero:np.ndarray, *tablero_jugador_tir
     if tablero_jugador_tiros:
         tablero_jugador_tiros[0][casilla[0], casilla[1]] = "A"
     print("CAMBIO TURNO")
-    return False, tablero
+    return not(turno), tablero
 
 def get_xy_tiro(turno:bool):
     if turno:
-        
+        casilla = [int(x) for x in input("Introduce dos nº separados por comma (fila, col): ").split(',')]
+        # TODO: ctrl input, chars, nr mayores
+        while (casilla in tirados_jugador):
+            print("Tiro repetido; intentalo de nuevo")
+            casilla = [int(x) for x in input("Introduce dos nº separados por comma (fila, col): ").split(',')]
+        print("Tirados jugador antes", tirados_jugador)
+        tirados_jugador.append(casilla)
+        print("Tirados jugador despues", tirados_jugador)
+    else:
+        print("El PC elige los números:")
+        time.sleep(2)
+        # Las coordenadas de tiros del PC se generan de forma aleatoria.
+        casilla = [random.randint(0,9) for _ in range(2)]
+        time.sleep(2)
+        print(casilla)
+        while (casilla in tirados_pc):
+            print("Tiro repetido; PC intenta de nuevo")
+            casilla = [random.randint(0,9) for _ in range(2)]
+        tirados_pc.append(casilla)
     return casilla
 
 # def colocar_barcos(barco, tablero):
