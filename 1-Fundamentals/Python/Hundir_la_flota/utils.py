@@ -9,6 +9,23 @@ from vars import *
 tirados_jugador = []
 tirados_pc = []
 
+def eleccion_tipo_juego():
+    """
+    Elección de tipo de juego: (0) Demo y (1) Completo.
+    """
+    while True:
+        try:
+            mensaje = (
+                "Por favor, elige la versión que desea probar:\n"
+                "\tPulsa 0️⃣  para la versión Demo.\n"
+                "\tPulsa 1️⃣  para la versión completa.\n"
+            )
+            vers_elegida = int(input(mensaje))
+
+            return bool(vers_elegida)
+        except ValueError as e:
+            print(colored(f"Entrada inválida: {e}. Intenta de nuevo.", "red"))
+
 def run_ansi_codes_4_colors():
     clr = lambda: os.system('color')
     return None
@@ -31,7 +48,7 @@ def pretty_tablero(tablero:np.ndarray):
         print(*tb)
     return None
 
-def crear_tablero(tamaño=10):
+def crear_tablero(tamaño=TAMANO_TABLERO):
     """
     Crea un tablero de dimensión `tamaño x tamaño` relleno con '_'. 
     Parametros:
@@ -50,7 +67,7 @@ def colocar_barcos(tablero:np.ndarray, barcos:list):  # update a lista de lista
         tablero: _np.ndarray_ el tablero actualizado con los barcos
     """
     # barco_jugador = [[[0, 3],[0, 4], [0, 5], [0, 6]], [[4, 7],[5, 7], [6, 7]], [[8, 8],[8, 9]],[[1, 7]]]
-    print("==================================================================>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", barcos)
+    print("==================================================================>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", barcos) if DEBUG_MODE else None
     for barco in barcos:
         for i in barco:
             tablero[i[0], i[1]] = "O"
@@ -69,29 +86,29 @@ def disparar(turno:bool, casilla:list, barcos:list, tablero:np.ndarray, tablero_
         (_True/False_, tablero): booleano: que representa si ha acertado o no, y el
         tablero actualizado
     '''
-    print("---------------------------------------casilla", casilla)
-    print("---------------------------------------barcos", barcos)
+    print("---------------------------------------casilla", casilla) if DEBUG_MODE else None
+    print("---------------------------------------barcos", barcos) if DEBUG_MODE else None
 
     for barco in barcos:
-        print("barco de for disparar:", barco)
+        print("barco de for disparar:", barco) if DEBUG_MODE else None
         if casilla in barco:
-            print('TOUCHE')
+            print(colored('TOUCHE 🎯', "yellow"))
             # Actualiza la casilla del barco tocado con "X"
             tablero[casilla[0], casilla[1]] = "X"
             tablero_jugador_tiros[casilla[0], casilla[1]] = "X"
             barco.remove(casilla)
             # Comprobar si se han tocado todas las casillas del barco.
             if len(barco) == 0:
-                print("BARCO HUNDIDO")
+                print(colored("BARCO HUNDIDO 🥳", "yellow"))
             return turno, tablero
 
     # En caso de fallo actualiza la casilla en el tablero con una "A"
-    print("agua")
+    print("agua") if DEBUG_MODE else None
     tablero[casilla[0], casilla[1]] = "A"
     if type(tablero_jugador_tiros) is np.ndarray:
         tablero_jugador_tiros[casilla[0], casilla[1]] = "A"
     # En este caso se hace el cambio de turno.
-    print("CAMBIO TURNO")
+    print(colored("CAMBIO TURNO", "magenta"))
     return not(turno), tablero
 
 def get_xy_tiro(turno:bool):
@@ -119,21 +136,21 @@ def get_xy_tiro(turno:bool):
                 
                 # Si todo es válido, agregar a la lista de tiros y salir del bucle
                 tirados_jugador.append(casilla)
-                print("Tirados jugador:", tirados_jugador)
+                print("Tirados jugador:", tirados_jugador) if DEBUG_MODE else None
                 return casilla
             except ValueError as e:
-                print(f"Entrada inválida: {e}. Intenta de nuevo.")
+                print(colored(f"Entrada inválida: {e}. Intenta de nuevo.", "red"))
     else:
         print("El PC elige los números:")
         time.sleep(2)
         while True:
             # Generar coordenadas aleatorias
             casilla = [random.randint(0, 9) for _ in range(2)]
-            
+            print(casilla)
             # Validar que no sea un tiro repetido
             if casilla not in tirados_pc:
                 tirados_pc.append(casilla)
-                print("Tirados PC:", tirados_pc)
+                print("Tirados PC:", tirados_pc) if DEBUG_MODE else None
                 return casilla
             print("Tiro repetido; PC intenta de nuevo.")
 
@@ -151,15 +168,16 @@ def hay_ganador(barcos:list, msg:str):
 
     '''
     if all(len(barco) == 0 for barco in barcos):
-            print(emoji.emojize(msg))
+            print(colored(emoji.emojize(msg),"yellow"))
             return True
     return False
 
-def ejecutar_turno(turno: bool, tablero: np.ndarray, barcos: list, tablero_tiros:np.ndarray= None):
+def ejecutar_turno(modalidad_juego:bool, turno: bool, tablero: np.ndarray, barcos: list, tablero_tiros:np.ndarray= None):
     """
     Ejecución del turno: se consigue la casilla a disparar, se dispara 
     y se actualiza el tablero de tiros.
     Parametros:
+        modalidad_juego: si es Demo/ Completo
         turno: _bool_ si es jugador/ pc
         tablero: _np.ndarray_ el tablero del "jugador"
         barcos: _list_ de los barcos a disparar
@@ -170,12 +188,14 @@ def ejecutar_turno(turno: bool, tablero: np.ndarray, barcos: list, tablero_tiros
     casilla = get_xy_tiro(turno)
     if type(tablero_tiros) is np.ndarray:
         turno, tablero = disparar(turno, casilla, barcos, tablero, tablero_tiros)
-        print("Tablero de tiros:")
-        pretty_tablero(tablero_tiros)
+        print("191 turno ------------------", turno) if DEBUG_MODE else None
+        if ( modalidad_juego == False):  # and turno (se cambia en disparar por lo tanto aqui no me sirve)
+            print("Tablero de tiros:")
+            pretty_tablero(tablero_tiros)
     else:
         turno, tablero = disparar(turno, casilla, barcos, tablero)
-    print("Tablero del", "Jugador" if turno else "PC" )
-    pretty_tablero(tablero)
+        print("Tablero del", "JUGADOR" if turno else "PC" )
+        pretty_tablero(tablero)
     return turno
 
 def init_juego():
@@ -188,14 +208,12 @@ def init_juego():
     """
     # 1 si es JUGADOR / 0 PC
     turno = True
-    barcos_pc_cpy = barcos_pc.copy()
-    barcos_jugador_cpy = barcos_jugador.copy()
 
     run_ansi_codes_4_colors()
     clear_console()
 
     print(emoji.emojize(TITLE))
-    print("=" * 100)
+    print("=" * 60)
 
     """
     Init tableros
@@ -204,12 +222,20 @@ def init_juego():
     tablero_jugador_tiros = crear_tablero()
     tablero_pc = crear_tablero()
 
-    # TODO: generar barcos
-    tablero_jugador = colocar_barcos(tablero_jugador, generar_barcos())
+    modalidad_juego = eleccion_tipo_juego()
+    print('modalidad_juego', modalidad_juego) if DEBUG_MODE else None
+    esloras = ESLORAS_6_BARCOS if modalidad_juego else ESLORAS_2_BARCOS
+    barcos_jugador = generar_barcos(esloras)
+    barcos_jugador_cpy = barcos_jugador.copy()
+    # tablero_jugador = colocar_barcos(tablero_jugador, generar_barcos(esloras))
+    tablero_jugador = colocar_barcos(tablero_jugador, barcos_jugador)
     print(colored("Tablero del Jugador con barcos cargados:", "blue"))
     pretty_tablero(tablero_jugador)
 
     tablero_pc = crear_tablero()
+    # tablero_pc = colocar_barcos(tablero_pc, barcos_pc)
+    barcos_pc = generar_barcos(esloras)
+    barcos_pc_cpy = barcos_pc.copy()
     tablero_pc = colocar_barcos(tablero_pc, barcos_pc)
     print(colored("Tablero del PC con barcos cargados:","green"))
     pretty_tablero(tablero_pc)
@@ -217,36 +243,35 @@ def init_juego():
     while True:                                                    # Mientras haya acertado el disparo
         print("El turno es del:", "JUGADOR" if turno else "PC")
         if turno:
-            turno = ejecutar_turno(turno, tablero_pc, barcos_pc_cpy, tablero_jugador_tiros)
+            turno = ejecutar_turno(modalidad_juego, turno, tablero_pc, barcos_pc_cpy, tablero_jugador_tiros)
             if hay_ganador(barcos_pc_cpy, MSG_GANARDOR):
                 break
         else:
             # turno PC
-            turno = ejecutar_turno(turno, tablero_jugador, barcos_jugador_cpy)
+            turno = ejecutar_turno(modalidad_juego, turno, tablero_jugador, barcos_jugador_cpy)
             if hay_ganador(barcos_pc_cpy, MSG_PERDEDOR):
                 break
 
-def generar_barcos():
+def generar_barcos(esloras: list):
     """
     Genera una lista de barcos que no se solapen y cuyos valores no sean mayores de 10.
     """
     tablero = set()  # Usamos un conjunto para rastrear las posiciones ocupadas
     barcos = []
-    longitudes = [2, 2, 2, 3, 3, 4]   # Longitudes de los barcos
 
-    for longitud in longitudes:
+    for eslora in esloras:
         while True:
             # Generar orientación aleatoria
             orientacion = random.choice(["H", "V"])
             
             if orientacion == "H":  # Horizontal
                 fila = random.randint(0, 9)
-                col = random.randint(0, 10 - longitud)
-                barco = [[fila, col + i] for i in range(longitud)]
+                col = random.randint(0, 10 - eslora)
+                barco = [[fila, col + i] for i in range(eslora)]
             else:  # Vertical
-                fila = random.randint(0, 10 - longitud)
+                fila = random.randint(0, 10 - eslora)
                 col = random.randint(0, 9)
-                barco = [[fila + i, col] for i in range(longitud)]
+                barco = [[fila + i, col] for i in range(eslora)]
             
             # Verificar que no se solapen
             if all(tuple(casilla) not in tablero for casilla in barco):
