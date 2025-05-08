@@ -1,3 +1,4 @@
+import emoji
 import numpy as np
 import os
 import random
@@ -50,14 +51,15 @@ def colocar_barcos(tablero:np.ndarray, barcos:list):  # update a lista de lista
 
 def disparar(turno:bool, casilla:list, barcos:list, tablero:np.ndarray, *tablero_jugador_tiros:np.ndarray):
     '''
-    Función de disparar para el Jugador. 
+    Función de disparar para el Jugador. Los tiros se representan con "X" si ha tocado barco,
+    y con "A" si ha tocado agua.
     Parametros de entrada:
         casilla: _lista_ de 2 valores _int_ que representa las coordenadas [row, col] del disparo
         barcos:  _lista_ de barcos correspondiente al turno
         tablero: _np.ndarray_, matriz sobre cual se ejecuta el disparo segun el turno
         tablero_jugador_tiros:  _np.ndarray_, arg opcional, el tablero de tiros del Jugador para actualizar los tiros
     Devuelve:
-        (True/False, tablero): booleano: que representa si ha acertado o no, y el
+        (_True/False_, tablero): booleano: que representa si ha acertado o no, y el
         tablero actualizado
     '''
     print("---------------------------------------casilla", casilla)
@@ -67,20 +69,22 @@ def disparar(turno:bool, casilla:list, barcos:list, tablero:np.ndarray, *tablero
         print("barco de for disparar:", barco)
         if casilla in barco:
             print('TOUCHE')
-            # pintarlo con "X"
+            # Actualiza la casilla del barco tocado con "X"
             tablero[casilla[0], casilla[1]] = "X"
             if tablero_jugador_tiros:
                 tablero_jugador_tiros[0][casilla[0], casilla[1]] = "X"
             barco.remove(casilla)
+            # Comprobar si se han tocado todas las casillas del barco.
             if len(barco) == 0:
                 print("BARCO HUNDIDO")
             return turno, tablero
 
-    # agua
+    # En caso de fallo actualiza la casilla en el tablero con una "A"
     print("agua")
     tablero[casilla[0], casilla[1]] = "A"
     if tablero_jugador_tiros:
         tablero_jugador_tiros[0][casilla[0], casilla[1]] = "A"
+    # En este caso se hace el cambio de turno.
     print("CAMBIO TURNO")
     return not(turno), tablero
 
@@ -134,3 +138,30 @@ def get_xy_tiro(turno:bool):
 # def crear_barco(eslora):
 # TODO
 #     pass
+
+def hay_ganador(barcos:list, msg:str):
+    '''
+    Verifica si hay un ganador: comprueba si quedan barcos en el tablero.
+    En este caso, si quedan barcos en la lista de _barcos_ que se recibe.
+    En caso afirmativo imprime el _msg_ y devuelve _True_ si ha llegado 
+    al final, _False_ en caso contrario.
+    Parametros:
+        barcos: _list_ de los barcos del jugador/pc
+        msg: _str_ que se devuelve si se cumple la condición
+    Devuelve:
+        _True/False_: booleano que marca si hay/no fin de juego.
+
+    '''
+    if all(len(barco) == 0 for barco in barcos):
+            print(emoji.emojize(msg))
+            return True
+    return False
+
+def ejecutar_turno(turno, tablero, barcos, tablero_tiros=None):
+    casilla = get_xy_tiro(turno)
+    turno, tablero = disparar(turno, casilla, barcos, tablero, tablero_tiros)
+    pretty_tablero(tablero)
+    if tablero_tiros:
+        print("Tablero de tiros:")
+        pretty_tablero(tablero_tiros)
+    return turno

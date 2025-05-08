@@ -191,20 +191,20 @@ from utils import *
 from var import *
 import emoji
 
-def verificar_ganador(barcos, mensaje_ganador):
-    if all(len(barco) == 0 for barco in barcos):
-        print(emoji.emojize(mensaje_ganador))
-        return True
-    return False
+# def verificar_ganador(barcos, mensaje_ganador):
+#     if all(len(barco) == 0 for barco in barcos):
+#         print(emoji.emojize(mensaje_ganador))
+#         return True
+#     return False
 
-def ejecutar_turno(turno, tablero, barcos, tablero_tiros=None):
-    casilla = get_xy_tiro(turno)
-    turno, tablero = disparar(turno, casilla, barcos, tablero, tablero_tiros)
-    pretty_tablero(tablero)
-    if tablero_tiros:
-        print("Tablero de tiros:")
-        pretty_tablero(tablero_tiros)
-    return turno
+# def ejecutar_turno(turno, tablero, barcos, tablero_tiros=None):
+#     casilla = get_xy_tiro(turno)
+#     turno, tablero = disparar(turno, casilla, barcos, tablero, tablero_tiros)
+#     pretty_tablero(tablero)
+#     if tablero_tiros:
+#         print("Tablero de tiros:")
+#         pretty_tablero(tablero_tiros)
+#     return turno
 
 # Inicialización
 clear_console()
