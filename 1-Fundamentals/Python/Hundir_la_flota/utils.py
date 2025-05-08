@@ -3,9 +3,15 @@ import numpy as np
 import os
 import random
 import time
+from termcolor import colored
+from vars import *
 
 tirados_jugador = []
 tirados_pc = []
+
+def run_ansi_codes_4_colors():
+    clr = lambda: os.system('color')
+    return None
 
 def clear_console():
     '''
@@ -44,12 +50,13 @@ def colocar_barcos(tablero:np.ndarray, barcos:list):  # update a lista de lista
         tablero: _np.ndarray_ el tablero actualizado con los barcos
     """
     # barco_jugador = [[[0, 3],[0, 4], [0, 5], [0, 6]], [[4, 7],[5, 7], [6, 7]], [[8, 8],[8, 9]],[[1, 7]]]
+    print("==================================================================>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", barcos)
     for barco in barcos:
         for i in barco:
             tablero[i[0], i[1]] = "O"
     return tablero
 
-def disparar(turno:bool, casilla:list, barcos:list, tablero:np.ndarray, *tablero_jugador_tiros:np.ndarray):
+def disparar(turno:bool, casilla:list, barcos:list, tablero:np.ndarray, tablero_jugador_tiros:np.ndarray=None):
     '''
     Función de disparar para el Jugador. Los tiros se representan con "X" si ha tocado barco,
     y con "A" si ha tocado agua.
@@ -71,8 +78,7 @@ def disparar(turno:bool, casilla:list, barcos:list, tablero:np.ndarray, *tablero
             print('TOUCHE')
             # Actualiza la casilla del barco tocado con "X"
             tablero[casilla[0], casilla[1]] = "X"
-            if tablero_jugador_tiros:
-                tablero_jugador_tiros[0][casilla[0], casilla[1]] = "X"
+            tablero_jugador_tiros[casilla[0], casilla[1]] = "X"
             barco.remove(casilla)
             # Comprobar si se han tocado todas las casillas del barco.
             if len(barco) == 0:
@@ -82,8 +88,8 @@ def disparar(turno:bool, casilla:list, barcos:list, tablero:np.ndarray, *tablero
     # En caso de fallo actualiza la casilla en el tablero con una "A"
     print("agua")
     tablero[casilla[0], casilla[1]] = "A"
-    if tablero_jugador_tiros:
-        tablero_jugador_tiros[0][casilla[0], casilla[1]] = "A"
+    if type(tablero_jugador_tiros) is np.ndarray:
+        tablero_jugador_tiros[casilla[0], casilla[1]] = "A"
     # En este caso se hace el cambio de turno.
     print("CAMBIO TURNO")
     return not(turno), tablero
@@ -131,14 +137,6 @@ def get_xy_tiro(turno:bool):
                 return casilla
             print("Tiro repetido; PC intenta de nuevo.")
 
-# def colocar_barco(barco, tablero):
-#     for fila, col in barco:
-#         tablero[fila, col] = 'O'
-
-# def crear_barco(eslora):
-# TODO
-#     pass
-
 def hay_ganador(barcos:list, msg:str):
     '''
     Verifica si hay un ganador: comprueba si quedan barcos en el tablero.
@@ -157,11 +155,107 @@ def hay_ganador(barcos:list, msg:str):
             return True
     return False
 
-def ejecutar_turno(turno, tablero, barcos, tablero_tiros=None):
+def ejecutar_turno(turno: bool, tablero: np.ndarray, barcos: list, tablero_tiros:np.ndarray= None):
+    """
+    Ejecución del turno: se consigue la casilla a disparar, se dispara 
+    y se actualiza el tablero de tiros.
+    Parametros:
+        turno: _bool_ si es jugador/ pc
+        tablero: _np.ndarray_ el tablero del "jugador"
+        barcos: _list_ de los barcos a disparar
+        tablero_tiros: en el caso del jugador pasamos su tablero a actualizar
+    Devuelve:
+        turno: _bool_ del turno (1- jugador, 0-pc)
+    """
     casilla = get_xy_tiro(turno)
-    turno, tablero = disparar(turno, casilla, barcos, tablero, tablero_tiros)
-    pretty_tablero(tablero)
-    if tablero_tiros:
+    if type(tablero_tiros) is np.ndarray:
+        turno, tablero = disparar(turno, casilla, barcos, tablero, tablero_tiros)
         print("Tablero de tiros:")
         pretty_tablero(tablero_tiros)
+    else:
+        turno, tablero = disparar(turno, casilla, barcos, tablero)
+    print("Tablero del", "Jugador" if turno else "PC" )
+    pretty_tablero(tablero)
     return turno
+
+def init_juego():
+    """
+    Método principal del juego. Flujo principal:
+        Crear tableros.
+        Colocar barcos.
+        Logica de turnos.
+        Fin de juego.
+    """
+    # 1 si es JUGADOR / 0 PC
+    turno = True
+    barcos_pc_cpy = barcos_pc.copy()
+    barcos_jugador_cpy = barcos_jugador.copy()
+
+    run_ansi_codes_4_colors()
+    clear_console()
+
+    print(emoji.emojize(TITLE))
+    print("=" * 100)
+
+    """
+    Init tableros
+    """
+    tablero_jugador = crear_tablero()
+    tablero_jugador_tiros = crear_tablero()
+    tablero_pc = crear_tablero()
+
+    # TODO: generar barcos
+    tablero_jugador = colocar_barcos(tablero_jugador, generar_barcos())
+    print(colored("Tablero del Jugador con barcos cargados:", "blue"))
+    pretty_tablero(tablero_jugador)
+
+    tablero_pc = crear_tablero()
+    tablero_pc = colocar_barcos(tablero_pc, barcos_pc)
+    print(colored("Tablero del PC con barcos cargados:","green"))
+    pretty_tablero(tablero_pc)
+
+    while True:                                                    # Mientras haya acertado el disparo
+        print("El turno es del:", "JUGADOR" if turno else "PC")
+        if turno:
+            turno = ejecutar_turno(turno, tablero_pc, barcos_pc_cpy, tablero_jugador_tiros)
+            if hay_ganador(barcos_pc_cpy, MSG_GANARDOR):
+                break
+        else:
+            # turno PC
+            turno = ejecutar_turno(turno, tablero_jugador, barcos_jugador_cpy)
+            if hay_ganador(barcos_pc_cpy, MSG_PERDEDOR):
+                break
+
+def generar_barcos():
+    """
+    Genera una lista de barcos que no se solapen y cuyos valores no sean mayores de 10.
+    """
+    tablero = set()  # Usamos un conjunto para rastrear las posiciones ocupadas
+    barcos = []
+    longitudes = [2, 2, 2, 3, 3, 4]   # Longitudes de los barcos
+
+    for longitud in longitudes:
+        while True:
+            # Generar orientación aleatoria
+            orientacion = random.choice(["H", "V"])
+            
+            if orientacion == "H":  # Horizontal
+                fila = random.randint(0, 9)
+                col = random.randint(0, 10 - longitud)
+                barco = [[fila, col + i] for i in range(longitud)]
+            else:  # Vertical
+                fila = random.randint(0, 10 - longitud)
+                col = random.randint(0, 9)
+                barco = [[fila + i, col] for i in range(longitud)]
+            
+            # Verificar que no se solapen
+            if all(tuple(casilla) not in tablero for casilla in barco):
+                barcos.append(barco)
+                tablero.update(tuple(casilla) for casilla in barco)
+                break
+
+    return barcos
+
+# def colocar_barco(barco, tablero):
+#     for fila, col in barco:
+#         tablero[fila, col] = 'O'

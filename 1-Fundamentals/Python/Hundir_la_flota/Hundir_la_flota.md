@@ -19,7 +19,7 @@
 * Python
 * Librerias básicas
 ```python
-numpy, random, time, emoji
+numpy, random, time, emoji, termcolor
 ```
 ## 📦 Instalación
 

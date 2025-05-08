@@ -142,10 +142,6 @@ def main():
         print("\nTablero de la máquina (oculto):")
         print(np.where(tablero_maquina == "O", "_", tablero_maquina))  # Ocultar barcos de la máquina
 
-if __name__ == "__main__":
-    main()
-
-
     # _____________________________________
 
     import random
@@ -229,3 +225,47 @@ while True:
         turno = ejecutar_turno(turno, tablero_jugador, barcos_jugador)
         if verificar_ganador(barcos_jugador, "El PC ha ganado :crying_face:. ¡Suerte la próxima vez!"):
             break
+
+
+def generar_barcos():
+    # Creamos un set para evitar solapamientos.
+    tablero = set()
+    
+    # Creamos una lista vacia para ir alamcenando todos los barcos.
+    barcos = []   
+
+# Las diferentes esloras de los barcos, en el TABLERO.
+    eslora = [2, 2, 2, 3, 3, 4] 
+
+    for longitud in eslora:
+        while True:
+            # Seleccionar si el barco va horizontal o vertical
+            orientacion = random.choice(['horizontal', 'vertical'])
+            
+            if orientacion == 'horizontal':
+                # Seleccionamos coordenada (x, y) inicial aleatoria
+                x = random.randint(0, 10 - longitud)  # Asegura que el barco cabe en el tablero.
+                y = random.randint(0, 9)
+                
+                # Verificamos si hay espacio para colocar el barco en el tablero.
+                posiciones = [(x + i, y) for i in range(longitud)] # Genera las posiciones del barco.
+
+                if not any(pos in tablero for pos in posiciones):  # Recorre cada posicion generada y verifica si esta ya ocupada.
+                    barcos.append(posiciones)   # Agrega las posiciones del barco a la lista barcos.
+                    tablero.update(posiciones)  # Actualiza y marca las posiciones ocupadas.
+                    break
+            
+            elif orientacion == 'vertical':
+                # Seleccionamos coordenada (x, y) inicial aleatoria
+                x = random.randint(0, 9)
+                y = random.randint(0, 10 - longitud)  # Asegura que el barco cabe en el tablero
+                
+                # Verificamos si hay espacio para colocar el barco
+                posiciones = [(x, y + i) for i in range(longitud)]  # Genera las posiciones del barco.
+
+                if not any(pos in tablero for pos in posiciones):  # Recorre cada posicion generada y verifica si esta ya ocupada.
+                    barcos.append(posiciones)  # Agrega las posiciones del barco a la lista barcos.
+                    tablero.update(posiciones)  # Actualiza y marca las posiciones ocupadas.
+                    break
+    
+    return barcos    # termina el ciclo actual, lo que indica que el barco ha sido colocado correctamente. 
