@@ -2,13 +2,10 @@ from utils import *
 from var import *
 import emoji
 
-# Variables globales
-
 # si ha tocado barco
 touche = True
 # 1 si es jugador / 0 PC
-turno = 1
-tirados = []
+turno = True
 
 """
 Init tableros

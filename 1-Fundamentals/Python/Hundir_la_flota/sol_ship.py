@@ -183,3 +183,49 @@ def generar_barcos():
 # Generar barcos
 barcos_jugador = generar_barcos()
 print(barcos_jugador)
+
+
+# ---------------------------------------------- OPT MAIN
+
+from utils import *
+from var import *
+import emoji
+
+def verificar_ganador(barcos, mensaje_ganador):
+    if all(len(barco) == 0 for barco in barcos):
+        print(emoji.emojize(mensaje_ganador))
+        return True
+    return False
+
+def ejecutar_turno(turno, tablero, barcos, tablero_tiros=None):
+    casilla = get_xy_tiro(turno)
+    turno, tablero = disparar(turno, casilla, barcos, tablero, tablero_tiros)
+    pretty_tablero(tablero)
+    if tablero_tiros:
+        print("Tablero de tiros:")
+        pretty_tablero(tablero_tiros)
+    return turno
+
+# Inicialización
+clear_console()
+print(emoji.emojize("======================================================== HUNDIR LA FLOTA :ship::bomb:"))
+
+tablero_jugador = crear_tablero()
+tablero_jugador_tiros = crear_tablero()
+tablero_pc = crear_tablero()
+
+tablero_jugador = colocar_barcos(tablero_jugador, barcos_jugador)
+tablero_pc = colocar_barcos(tablero_pc, barcos_pc)
+
+while True:
+    clear_console()
+    print("El turno es del:", "JUGADOR" if turno else "PC")
+    
+    if turno:
+        turno = ejecutar_turno(turno, tablero_pc, barcos_pc, tablero_jugador_tiros)
+        if verificar_ganador(barcos_pc, "Felicidades, has ganado!:trophy:"):
+            break
+    else:
+        turno = ejecutar_turno(turno, tablero_jugador, barcos_jugador)
+        if verificar_ganador(barcos_jugador, "El PC ha ganado :crying_face:. ¡Suerte la próxima vez!"):
+            break
