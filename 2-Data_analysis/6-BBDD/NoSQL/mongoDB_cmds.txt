@@ -1,0 +1,22 @@
+
+listar los contenedores disponibles
+    docker container ls -a  -- consulta de los dockers disponibles
+ejecutar el mongoshell de Mongo en terminal 
+    docker exec -it mongoDB mongosh
+
+cmds basicos:
+    show dbs
+
+    use [nombre_db para] elegir la DB si existe y si NO existe lo CREA
+
+    show collections para ver las colleciones
+
+    db.[nombre_collections].find()
+
+    insert 1er registro: db.clientes.insertOne({})
+
+install vsc extension: MongoDB for VS Code
+    - mongodb://localhost:27017
+    - create playground() linea 13
+
+    .insertMany()
