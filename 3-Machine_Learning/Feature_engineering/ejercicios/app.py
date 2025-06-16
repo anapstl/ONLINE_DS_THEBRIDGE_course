@@ -6,13 +6,13 @@ import streamlit as st
 st.title('Predecir el precio de tu coche!')
 st.header('Introduce los siguientes valores:')
 
-@st.cache_data
+# @st.cache_data
 def cargar_marca_map():
     with open('marca_map.pkl', 'rb') as f:
         return pkl.load(f)
 
 marca_map = cargar_marca_map()
-@st.cache_data
+# @st.cache_data
 def cargar_model_map():
     with open('model_map.pkl', 'rb') as f:
         return pkl.load(f)
@@ -24,10 +24,10 @@ p4 = int(st.number_input('KM:'))
 p5 = int(st.number_input('CV:'))
 p6 = int(st.number_input('Cambio (1 = manual, 0 = automático):'))
 
-@st.cache_data
+# @st.cache_data
 def cargar_modelo():
-    # with open('modelo_polynomial.pkl', 'rb') as f:
-    with open('modelo_poly_ridge.pkl', 'rb') as f:
+    with open('modelo_polynomial_1.pkl', 'rb') as f:
+    # with open('modelo_poly_ridge.pkl', 'rb') as f:
         modelo = pkl.load(f)
     return modelo
 
@@ -53,6 +53,7 @@ if st.button('Predecir!'):
 
     entrada_df = pd.DataFrame(entrada_dict, columns=columnas)
     print(entrada_df.info())
+    print(entrada_df)
 
     entrada_array = entrada_df.to_numpy()
     precio_predicho = modelo.predict(entrada_array)[0]
