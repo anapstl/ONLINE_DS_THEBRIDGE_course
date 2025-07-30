@@ -1,0 +1,20 @@
+# Usa la imagen oficial de Python 3.11 en su versión slim
+FROM python:3.11-slim
+# Establece el directorio de trabajo dentro del contenedor
+WORKDIR /app 
+# Copia el archivo de requisitos al directorio de trabajo
+# y luego instala las dependencias.
+# Se usa --no-cache-dir para evitar almacenar paquetes en caché,
+# lo que reduce el tamaño final de la imagen.
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+# Copia la aplicación Flask y la carpeta 'data' al directorio de trabajo
+# La carpeta 'data' debe contener 'advertising_model.pkl' y 'advertising.db'
+COPY . .
+# Expone el puerto en el que la aplicación Flask se ejecutará
+# (coincide con el puerto 8000 especificado en app.py)
+EXPOSE 8000
+# Define el comando para ejecutar la aplicación Flask
+# Usa '0.0.0.0' como host para que sea accesible desde fuera del contenedor
+# Esto es importante para que el contenedor pueda ser accedido desde el exterior.
+CMD ["python", "app.py"]

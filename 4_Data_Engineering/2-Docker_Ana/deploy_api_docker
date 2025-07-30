@@ -1,0 +1,17 @@
+docker build -t mi_api .
+docker images
+docker login
+docker tag mi_api anapstl/mi_api
+docker push anapstl/mi_api
+----------------------------------------
+docker pull anapstl/mi_api
+
+docker pull diegodng/mi_api:latest
+docker run -d -p 8000:8000 anapstl/mi_api
+
+docker run -d -p 8000:8000 diegodng/mi_api
+docker stop diegodng/mi_api
+docker stop fb6b49194d7e
+
+
+
